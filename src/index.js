@@ -1,52 +1,62 @@
 const fetch = require('node-fetch');
-const fs = require('fs-extra');
 const shp = require('shpjs');
 const parser = require('fast-xml-parser');
 
-const url =
-  'http://www.nhc.noaa.gov/gis/forecast/archive/al012013_5day_002.zip';
-
-const file = './data/forecast.json';
-
 class Ibis {
-  constructor() {}
-  async getForecast(shape) {
-    const res = await fetch(url);
+  constructor({ name, basin = 'at', example = false }) {
+    this.basin = basin;
+    this.example = example;
+    this.name = name;
+
+    this.shp = {
+      forecast: () => this.getShp('Forecast'),
+      bestTrack: () => this.getShp('Preliminary Best Track')
+    };
+
+    if (!this.name) {
+      console.log('No storm name provided returning all active storms');
+    }
+  }
+  async getShp(shape) {
+    const hurricaneFeed = await this.parseRSS();
+
+    if (hurricaneFeed.length == 0 && this.name) {
+      throw new Error(`No GIS data found for storm ${this.name.toUpperCase()}`)
+    }
+
+    const wantedGIS = hurricaneFeed.find(d => d.title.includes(shape));
+
+    const res = await fetch(wantedGIS.link);
     const buffer = await res.buffer();
     const geoJSON = await shp(buffer);
 
-    return geoJSON.filter(d => d.fileName === `al012013.002_5day_${shape}`);
+    return geoJSON;
   }
-}
+  async parseRSS() {
+    const feed = `https://www.nhc.noaa.gov/${
+      this.example ? 'rss_examples/' : ''
+    }gis-${this.basin}.xml`;
 
-// async function readEach() {
-// const ibis = new Ibis();
+    const res = await fetch(feed);
+    const xmlData = await res.text();
 
-// // Returns forecast for active storm in geoJSON format.
-// // If no active storms, returns "No active storms"
-// let [forecast] = await ibis.getForecast('lin');
-
-// await fs.outputJson(file, forecast, {spaces: 2})
-// }
-
-fetch('https://www.nhc.noaa.gov/rss_examples/gis-at.xml')
-  .then(res => res.text())
-  .then(xml => {
-    let { rss } = parser.parse(xml);
+    // Destructure to simplify output
+    const { rss } = parser.parse(xmlData);
 
     let items = rss.channel.item;
 
-    let wanted = ['Forecast [shp]', 'Preliminary Best Track [shp]'];
+    // Returns all shapefile links unless storm name is provided
+    // All shapefiles are always passed so the user can decide which ones they want downloaded
+    return items.filter(d => {
+      if (this.name) {
+        return (
+          d.title.includes('[shp]') && d.title.includes(this.name.toUpperCase())
+        );
+      } else {
+        return d.title.includes('[shp]');
+      }
+    });
+  }
+}
 
-    let found = [];
-
-    for (let each of wanted) {
-        found.push(items.find(d => d.title.includes(each)))
-    }
-    
-
-    console.log(found);
-    
-
-  })
-  .catch(console.error);
+module.exports = Ibis;
