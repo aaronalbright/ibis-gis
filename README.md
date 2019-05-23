@@ -15,7 +15,7 @@ npm install node-ibis
 ## Usage
 
 ```js
-const Ibis = require('node-ibis')
+const Ibis = require('node-ibis');
 
 async function getBestTrack() {
   const ibis = new Ibis();
@@ -25,7 +25,11 @@ async function getBestTrack() {
 
 ```
 
-## API
+## Methods
+
+*Coming soon*
+
+## Using the data (definitions)
 
 *Coming soon*
 
