@@ -1,8 +1,6 @@
 node_modules
 .cache
 .vscode
-dist
-build
 
 data
 .tmp

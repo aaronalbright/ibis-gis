@@ -1,27 +1,32 @@
 {
   "name": "ibis",
-  "version": "1.0.0",
+  "version": "0.0.2",
   "description": "Node NHC scraper",
-  "main": "index.js",
+  "main": "dist/index.js",
+  "module": "dist/module.js",
   "author": "Aaron Albright",
   "license": "MIT",
   "private": true,
   "devDependencies": {
-    "@babel/core": "^7.0.0-0",
+    "@babel/core": "^7.4.5",
     "@babel/preset-env": "^7.4.5",
-    "eslint": "^5.16.0"
+    "@babel/plugin-transform-runtime": "^7.4.4",
+    "eslint": "^5.16.0",
+    "rollup": "^1.14.3",
+    "rollup-plugin-babel": "^4.3.2",
+    "rollup-plugin-node-resolve": "^5.0.1",
+    "fs-extra": "^8.0.1"
   },
   "dependencies": {
+    "@babel/runtime": "^7.4.5",
     "fast-xml-parser": "^3.12.16",
-    "fs-extra": "^8.0.1",
     "node-fetch": "^2.6.0",
-    "parcel-bundler": "^1.12.3",
-    "shapefile": "^0.6.6",
     "shpjs": "^3.4.3"
   },
   "scripts": {
-    "clean": "rm dist/bundle.js",
-    "watch": "parcel watch src/index.js",
-    "build-prod": "parcel build src/index.js --target node --bundle-node-modules"
+    "clean": "rm -rf dist",
+    "build": "rollup -c",
+    "watch": "rollup -c -w",
+    "test": "node app.js"
   }
 }

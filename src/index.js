@@ -1,30 +1,31 @@
-const fetch = require('node-fetch');
-const shp = require('shpjs');
-const parser = require('fast-xml-parser');
+import fetch from 'node-fetch';
+import shp from 'shpjs';
+import parser from 'fast-xml-parser';
 
-class Ibis {
+export default class Ibis {
   constructor({ name, basin = 'at', example = false }) {
     this.basin = basin;
     this.example = example;
     this.name = name;
 
-    this.shp = {
-      forecast: () => this.getShp('Forecast'),
-      bestTrack: () => this.getShp('Preliminary Best Track')
-    };
-
     if (!this.name) {
-      console.log('No storm name provided returning all active storms');
+      console.log('No storm name provided. Getting all active storms...');
     }
   }
-  async getShp(shape) {
+  async forecast() {
+    return this.getShp('Forecast')
+  }
+  async bestTrack() {
+    return this.getShp('Preliminary Best Track');
+  }
+  async getShp(shpTitle) {
     const hurricaneFeed = await this.parseRSS();
 
     if (hurricaneFeed.length == 0 && this.name) {
       throw new Error(`No GIS data found for storm ${this.name.toUpperCase()}`)
     }
-
-    const wantedGIS = hurricaneFeed.find(d => d.title.includes(shape));
+    
+    const wantedGIS = hurricaneFeed.find(d => d.title.includes(shpTitle));
 
     const res = await fetch(wantedGIS.link);
     const buffer = await res.buffer();
@@ -46,7 +47,7 @@ class Ibis {
     let items = rss.channel.item;
 
     // Returns all shapefile links unless storm name is provided
-    // All shapefiles are always passed so the user can decide which ones they want downloaded
+    // All shapefiles are always parsed so the user can decide which ones they want downloaded
     return items.filter(d => {
       if (this.name) {
         return (
@@ -58,5 +59,3 @@ class Ibis {
     });
   }
 }
-
-module.exports = Ibis;
