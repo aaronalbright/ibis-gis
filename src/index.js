@@ -3,35 +3,46 @@ import shp from 'shpjs';
 import parser from 'fast-xml-parser';
 
 export default class Ibis {
-  constructor({ name, basin = 'at', example = false }) {
+  constructor({ name, basin = 'at', exampleData = false }) {
     this.basin = basin;
-    this.example = example;
+    this.example = exampleData;
     this.name = name;
+    this.get = {};
+
+    const items = {
+      forecast: 'Forecast',
+      bestTrack: 'Preliminary Best Track',
+      windField: 'Advisory Wind Field',
+      stormSurge: 'Probabilistic Storm Surge 5ft'
+    };
 
     if (!this.name) {
       console.log('No storm name provided. Getting all active storms...');
+    } else {
+      console.log(`Looking for GIS files for storm ${this.name}...`);
     }
+
+    for (const key in items) {
+      if (items.hasOwnProperty(key)) {
+        this.get[key] = () => this.geoJSON(items[key]);
+      }
+    }
+
   }
-  async forecast() {
-    return this.getShp('Forecast')
-  }
-  async bestTrack() {
-    return this.getShp('Preliminary Best Track');
-  }
-  async getShp(shpTitle) {
+  async geoJSON(shpTitle) {
     const hurricaneFeed = await this.parseRSS();
 
     if (hurricaneFeed.length == 0 && this.name) {
-      throw new Error(`No GIS data found for storm ${this.name.toUpperCase()}`)
+      throw new Error(`No GIS data found for storm ${this.name.toUpperCase()}`);
     }
-    
+
     const wantedGIS = hurricaneFeed.find(d => d.title.includes(shpTitle));
 
     const res = await fetch(wantedGIS.link);
     const buffer = await res.buffer();
-    const geoJSON = await shp(buffer);
+    const json = await shp(buffer);
 
-    return geoJSON;
+    return json;
   }
   async parseRSS() {
     const feed = `https://www.nhc.noaa.gov/${
