@@ -9,6 +9,13 @@ import parser from 'fast-xml-parser';
 var Ibis =
 /*#__PURE__*/
 function () {
+  /**
+   * Gets hurricane GIS data as geoJSON
+   * @param {Object} [opts] - Options for getting data
+   * @param {string}  [opts.name] - Name of storm to get GIS data. Must exist in NHC feed.
+   * @param {string} [opts.basin=at] - Either 'at' for Atlantic or 'ep' for Eastern Pacific
+   * @param {boolean} [opts.exampleData=false] - Used to get example active storm data
+   */
   function Ibis(_ref) {
     var _this = this;
 
@@ -40,7 +47,7 @@ function () {
     var _loop = function _loop(key) {
       if (items.hasOwnProperty(key)) {
         _this.get[key] = function () {
-          return _this.geoJSON(items[key]);
+          return _this.getJSON(items[key]);
         };
       }
     };
@@ -51,9 +58,9 @@ function () {
   }
 
   _createClass(Ibis, [{
-    key: "geoJSON",
+    key: "getJSON",
     value: function () {
-      var _geoJSON = _asyncToGenerator(
+      var _getJSON = _asyncToGenerator(
       /*#__PURE__*/
       _regeneratorRuntime.mark(function _callee(shpTitle) {
         var hurricaneFeed, wantedGIS, res, buffer, json;
@@ -103,11 +110,11 @@ function () {
         }, _callee, this);
       }));
 
-      function geoJSON(_x) {
-        return _geoJSON.apply(this, arguments);
+      function getJSON(_x) {
+        return _getJSON.apply(this, arguments);
       }
 
-      return geoJSON;
+      return getJSON;
     }()
   }, {
     key: "parseRSS",
@@ -166,4 +173,4 @@ function () {
   return Ibis;
 }();
 
-export default Ibis;
+module.exports = Ibis;

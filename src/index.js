@@ -2,7 +2,14 @@ import fetch from 'node-fetch';
 import shp from 'shpjs';
 import parser from 'fast-xml-parser';
 
-export default class Ibis {
+class Ibis {
+  /**
+   * Gets hurricane GIS data as geoJSON
+   * @param {Object} [opts] - Options for getting data
+   * @param {string}  [opts.name] - Name of storm to get GIS data. Must exist in NHC feed.
+   * @param {string} [opts.basin=at] - Either 'at' for Atlantic or 'ep' for Eastern Pacific
+   * @param {boolean} [opts.exampleData=false] - Used to get example active storm data
+   */
   constructor({ name, basin = 'at', exampleData = false }) {
     this.basin = basin;
     this.example = exampleData;
@@ -24,12 +31,11 @@ export default class Ibis {
 
     for (const key in items) {
       if (items.hasOwnProperty(key)) {
-        this.get[key] = () => this.geoJSON(items[key]);
+        this.get[key] = () => this.getJSON(items[key]);
       }
     }
-
   }
-  async geoJSON(shpTitle) {
+  async getJSON(shpTitle) {
     const hurricaneFeed = await this.parseRSS();
 
     if (hurricaneFeed.length == 0 && this.name) {
@@ -70,3 +76,5 @@ export default class Ibis {
     });
   }
 }
+
+module.exports = Ibis;
