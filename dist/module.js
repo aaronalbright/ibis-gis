@@ -1,176 +1,193 @@
 import _regeneratorRuntime from '@babel/runtime/regenerator';
 import _asyncToGenerator from '@babel/runtime/helpers/asyncToGenerator';
 import _classCallCheck from '@babel/runtime/helpers/classCallCheck';
-import _createClass from '@babel/runtime/helpers/createClass';
+import _defineProperty from '@babel/runtime/helpers/defineProperty';
+import mapValues from 'lodash/mapValues';
 import fetch from 'node-fetch';
-import shp from 'shpjs';
 import parser from 'fast-xml-parser';
+import _objectSpread from '@babel/runtime/helpers/objectSpread';
+import shp from 'shpjs';
+
+function parseRSS (_x, _x2) {
+  return _ref.apply(this, arguments);
+}
+
+function _ref() {
+  _ref = _asyncToGenerator(
+  /*#__PURE__*/
+  _regeneratorRuntime.mark(function _callee(basin, example) {
+    var feed, res, xmlData, _parser$parse, rss, items;
+
+    return _regeneratorRuntime.wrap(function _callee$(_context) {
+      while (1) {
+        switch (_context.prev = _context.next) {
+          case 0:
+            feed = "https://www.nhc.noaa.gov/".concat(example ? 'rss_examples/' : '', "gis-").concat(basin, ".xml");
+            _context.next = 3;
+            return fetch(feed);
+
+          case 3:
+            res = _context.sent;
+            _context.next = 6;
+            return res.text();
+
+          case 6:
+            xmlData = _context.sent;
+            _parser$parse = parser.parse(xmlData), rss = _parser$parse.rss;
+            items = rss.channel.item;
+            return _context.abrupt("return", items.filter(function (d) {
+              return d.title.includes('[shp]');
+            }));
+
+          case 10:
+          case "end":
+            return _context.stop();
+        }
+      }
+    }, _callee);
+  }));
+  return _ref.apply(this, arguments);
+}
+
+function fetchGIS (_ref) {
+  var link = _ref.link,
+      pubDate = _ref.pubDate;
+  return (
+    /*#__PURE__*/
+    _asyncToGenerator(
+    /*#__PURE__*/
+    _regeneratorRuntime.mark(function _callee() {
+      var res, buffer, json;
+      return _regeneratorRuntime.wrap(function _callee$(_context) {
+        while (1) {
+          switch (_context.prev = _context.next) {
+            case 0:
+              _context.next = 2;
+              return fetch(link);
+
+            case 2:
+              res = _context.sent;
+              _context.next = 5;
+              return res.buffer();
+
+            case 5:
+              buffer = _context.sent;
+              _context.next = 8;
+              return shp(buffer);
+
+            case 8:
+              json = _context.sent;
+              return _context.abrupt("return", json.map(function (d) {
+                return _objectSpread({}, d, {
+                  pubDate: pubDate
+                });
+              }));
+
+            case 10:
+            case "end":
+              return _context.stop();
+          }
+        }
+      }, _callee);
+    }))
+  );
+}
+
+var items = {
+  forecast: 'Forecast',
+  bestTrack: 'Preliminary Best Track',
+  windField: 'Advisory Wind Field',
+  stormSurge: 'Probabilistic Storm Surge 5ft'
+};
 
 var Ibis =
-/*#__PURE__*/
-function () {
-  /**
-   * Gets hurricane GIS data as geoJSON
-   * @param {Object} [opts] - Options for getting data
-   * @param {string}  [opts.name] - Name of storm to get GIS data. Must exist in NHC feed.
-   * @param {string} [opts.basin=at] - Either 'at' for Atlantic or 'ep' for Eastern Pacific
-   * @param {boolean} [opts.exampleData=false] - Used to get example active storm data
-   */
-  function Ibis(_ref) {
-    var _this = this;
+/**
+ * Gets hurricane GIS data as geoJSON
+ * @param {Object} [opts] - Options for getting data
+ * @param {string}  [opts.name] - Name of storm to get GIS data. Must exist in NHC feed.
+ * @param {string} [opts.basin] - Either 'at' for Atlantic or 'ep' for Eastern Pacific
+ * @param {boolean} [opts.exampleData] - Used to get example active storm data
+ */
+function Ibis() {
+  var _this = this;
 
-    var name = _ref.name,
-        _ref$basin = _ref.basin,
-        basin = _ref$basin === void 0 ? 'at' : _ref$basin,
-        _ref$exampleData = _ref.exampleData,
-        exampleData = _ref$exampleData === void 0 ? false : _ref$exampleData;
+  var _ref = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {},
+      name = _ref.name,
+      _ref$basin = _ref.basin,
+      basin = _ref$basin === void 0 ? 'at' : _ref$basin,
+      _ref$exampleData = _ref.exampleData,
+      exampleData = _ref$exampleData === void 0 ? false : _ref$exampleData;
 
-    _classCallCheck(this, Ibis);
+  _classCallCheck(this, Ibis);
 
-    this.basin = basin;
-    this.example = exampleData;
-    this.name = name;
-    this.get = {};
-    var items = {
-      forecast: 'Forecast',
-      bestTrack: 'Preliminary Best Track',
-      windField: 'Advisory Wind Field',
-      stormSurge: 'Probabilistic Storm Surge 5ft'
-    };
-
-    if (!this.name) {
-      console.log('No storm name provided. Getting all active storms...');
-    } else {
-      console.log("Looking for GIS files for storm ".concat(this.name, "..."));
-    }
-
-    var _loop = function _loop(key) {
-      if (items.hasOwnProperty(key)) {
-        _this.get[key] = function () {
-          return _this.getJSON(items[key]);
-        };
-      }
-    };
-
-    for (var key in items) {
-      _loop(key);
-    }
-  }
-
-  _createClass(Ibis, [{
-    key: "getJSON",
-    value: function () {
-      var _getJSON = _asyncToGenerator(
+  _defineProperty(this, "find", function (filterVal) {
+    return (
       /*#__PURE__*/
-      _regeneratorRuntime.mark(function _callee(shpTitle) {
-        var hurricaneFeed, wantedGIS, res, buffer, json;
+      _asyncToGenerator(
+      /*#__PURE__*/
+      _regeneratorRuntime.mark(function _callee() {
+        var shps, gis, r, stormName;
         return _regeneratorRuntime.wrap(function _callee$(_context) {
           while (1) {
             switch (_context.prev = _context.next) {
               case 0:
                 _context.next = 2;
-                return this.parseRSS();
+                return parseRSS(_this.basin, _this.example);
 
               case 2:
-                hurricaneFeed = _context.sent;
+                shps = _context.sent;
 
-                if (!(hurricaneFeed.length == 0 && this.name)) {
-                  _context.next = 5;
+                if (_this.name) {
+                  shps = shps.filter(function (d) {
+                    return d.title.includes(_this.name.toUpperCase());
+                  });
+                  console.log(shps.length);
+                }
+
+                gis = shps.filter(function (d) {
+                  return d.title.includes(filterVal);
+                });
+                r = /[A-Z]+\b/g;
+
+                if (!(gis.length === 1)) {
+                  _context.next = 11;
                   break;
                 }
 
-                throw new Error("No GIS data found for storm ".concat(this.name.toUpperCase()));
-
-              case 5:
-                wantedGIS = hurricaneFeed.find(function (d) {
-                  return d.title.includes(shpTitle);
+                stormName = gis[0].title.match(r);
+                return _context.abrupt("return", {
+                  name: stormName[0],
+                  date: gis[0].pubDate,
+                  fetchGIS: fetchGIS(gis[0])
                 });
-                _context.next = 8;
-                return fetch(wantedGIS.link);
-
-              case 8:
-                res = _context.sent;
-                _context.next = 11;
-                return res.buffer();
 
               case 11:
-                buffer = _context.sent;
-                _context.next = 14;
-                return shp(buffer);
+                return _context.abrupt("return", gis.map(function (d) {
+                  var stormName = d.title.match(r);
+                  return {
+                    name: stormName[0],
+                    date: d.pubDate,
+                    fetchGIS: fetchGIS(d)
+                  };
+                }));
 
-              case 14:
-                json = _context.sent;
-                return _context.abrupt("return", json);
-
-              case 16:
+              case 12:
               case "end":
                 return _context.stop();
             }
           }
-        }, _callee, this);
-      }));
+        }, _callee);
+      }))
+    );
+  });
 
-      function getJSON(_x) {
-        return _getJSON.apply(this, arguments);
-      }
+  _defineProperty(this, "get", mapValues(items, function (m) {
+    return _this.find(m);
+  }));
 
-      return getJSON;
-    }()
-  }, {
-    key: "parseRSS",
-    value: function () {
-      var _parseRSS = _asyncToGenerator(
-      /*#__PURE__*/
-      _regeneratorRuntime.mark(function _callee2() {
-        var _this2 = this;
-
-        var feed, res, xmlData, _parser$parse, rss, items;
-
-        return _regeneratorRuntime.wrap(function _callee2$(_context2) {
-          while (1) {
-            switch (_context2.prev = _context2.next) {
-              case 0:
-                feed = "https://www.nhc.noaa.gov/".concat(this.example ? 'rss_examples/' : '', "gis-").concat(this.basin, ".xml");
-                _context2.next = 3;
-                return fetch(feed);
-
-              case 3:
-                res = _context2.sent;
-                _context2.next = 6;
-                return res.text();
-
-              case 6:
-                xmlData = _context2.sent;
-                // Destructure to simplify output
-                _parser$parse = parser.parse(xmlData), rss = _parser$parse.rss;
-                items = rss.channel.item; // Returns all shapefile links unless storm name is provided
-                // All shapefiles are always parsed so the user can decide which ones they want downloaded
-
-                return _context2.abrupt("return", items.filter(function (d) {
-                  if (_this2.name) {
-                    return d.title.includes('[shp]') && d.title.includes(_this2.name.toUpperCase());
-                  } else {
-                    return d.title.includes('[shp]');
-                  }
-                }));
-
-              case 10:
-              case "end":
-                return _context2.stop();
-            }
-          }
-        }, _callee2, this);
-      }));
-
-      function parseRSS() {
-        return _parseRSS.apply(this, arguments);
-      }
-
-      return parseRSS;
-    }()
-  }]);
-
-  return Ibis;
-}();
+  this.name = name;
+  this.basin = basin;
+  this.example = exampleData;
+};
 
 module.exports = Ibis;

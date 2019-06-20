@@ -1,80 +1,84 @@
-import fetch from 'node-fetch';
-import shp from 'shpjs';
-import parser from 'fast-xml-parser';
+import mapValues from 'lodash/mapValues';
+
+import parseRSS from './rss';
+import fetchGIS from './gis';
+
+const items = {
+  forecast: 'Forecast',
+  bestTrack: 'Preliminary Best Track',
+  windField: 'Advisory Wind Field',
+  stormSurge: 'Probabilistic Storm Surge 5ft'
+};
+
+const names = [
+  'Andrea',
+  'Barry',
+  'Chantal',
+  'Dorian',
+  'Erin',
+  'Fernand',
+  'Gabrielle',
+  'Humberto',
+  'Imelda',
+  'Jerry',
+  'Karen',
+  'Lorenzo',
+  'Melissa',
+  'Nestor',
+  'Olga',
+  'Pablo',
+  'Rebekah',
+  'Sebastien',
+  'Tanya',
+  'Van',
+  'Wendy'
+];
 
 class Ibis {
   /**
    * Gets hurricane GIS data as geoJSON
    * @param {Object} [opts] - Options for getting data
    * @param {string}  [opts.name] - Name of storm to get GIS data. Must exist in NHC feed.
-   * @param {string} [opts.basin=at] - Either 'at' for Atlantic or 'ep' for Eastern Pacific
-   * @param {boolean} [opts.exampleData=false] - Used to get example active storm data
+   * @param {string} [opts.basin] - Either 'at' for Atlantic or 'ep' for Eastern Pacific
+   * @param {boolean} [opts.exampleData] - Used to get example active storm data
    */
-  constructor({ name, basin = 'at', exampleData = false }) {
+  constructor({name, basin = 'at', exampleData = false } = {}) {
+    this.name = name;
     this.basin = basin;
     this.example = exampleData;
-    this.name = name;
-    this.get = {};
 
-    const items = {
-      forecast: 'Forecast',
-      bestTrack: 'Preliminary Best Track',
-      windField: 'Advisory Wind Field',
-      stormSurge: 'Probabilistic Storm Surge 5ft'
-    };
+  }
 
-    if (!this.name) {
-      console.log('No storm name provided. Getting all active storms...');
+  find = filterVal => async () => {
+    let shps = await parseRSS(this.basin, this.example);
+    if (this.name) {
+      shps = shps.filter(d => d.title.includes(this.name.toUpperCase()));
+      console.log(shps.length);
+    }
+    const gis = shps.filter(d => d.title.includes(filterVal));
+
+    let r = /[A-Z]+\b/g;
+
+    if (gis.length === 1) {
+      let stormName = gis[0].title.match(r);
+      return {
+        name: stormName[0],
+        date: gis[0].pubDate,
+        fetchGIS: fetchGIS(gis[0])
+      };
     } else {
-      console.log(`Looking for GIS files for storm ${this.name}...`);
+      return gis.map(d => {
+        let stormName = d.title.match(r);
+        return {
+          name: stormName[0],
+          date: d.pubDate,
+          fetchGIS: fetchGIS(d)
+        };
+      });
     }
+  };
 
-    for (const key in items) {
-      if (items.hasOwnProperty(key)) {
-        this.get[key] = () => this.getJSON(items[key]);
-      }
-    }
-  }
-  async getJSON(shpTitle) {
-    const hurricaneFeed = await this.parseRSS();
-
-    if (hurricaneFeed.length == 0 && this.name) {
-      throw new Error(`No GIS data found for storm ${this.name.toUpperCase()}`);
-    }
-
-    const wantedGIS = hurricaneFeed.find(d => d.title.includes(shpTitle));
-
-    const res = await fetch(wantedGIS.link);
-    const buffer = await res.buffer();
-    const json = await shp(buffer);
-
-    return json;
-  }
-  async parseRSS() {
-    const feed = `https://www.nhc.noaa.gov/${
-      this.example ? 'rss_examples/' : ''
-    }gis-${this.basin}.xml`;
-
-    const res = await fetch(feed);
-    const xmlData = await res.text();
-
-    // Destructure to simplify output
-    const { rss } = parser.parse(xmlData);
-
-    let items = rss.channel.item;
-
-    // Returns all shapefile links unless storm name is provided
-    // All shapefiles are always parsed so the user can decide which ones they want downloaded
-    return items.filter(d => {
-      if (this.name) {
-        return (
-          d.title.includes('[shp]') && d.title.includes(this.name.toUpperCase())
-        );
-      } else {
-        return d.title.includes('[shp]');
-      }
-    });
-  }
+  get = mapValues(items, m => this.find(m));
 }
 
 module.exports = Ibis;
