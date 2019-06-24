@@ -7,7 +7,7 @@ This one gets hurricane GIS data from the [National Hurricane Center](1) in geoJ
 
 ## Why? 
 
-The NHC provides an easy-to-access RSS feed of its GIS products that is updated regularly during an active storm. This tool allows for automating the fetching process in addiition to converting the `.shp` ZIP files into geoJSON `FeatureCollection` arrays.
+The NHC provides an easy-to-access RSS feed of its GIS products that is updated regularly during an active storm. This tool allows for automating the fetching process in addiition to converting the `.shp` ZIP files into array of geoJSON FeatureCollections.
 
 Ibis attempts to be as unopinionated as possible. It doesn't change any properties or names of the GIS data. It only assumes you want a spefific shapefile.
 
@@ -25,7 +25,7 @@ yarn add node-ibis
 
 ## Usage
 
-__Active Storm__
+__Active Storm(s)__
 
 ```js
 import Ibis from 'node-ibis'
@@ -48,7 +48,7 @@ async function getForecast() {
 - `options <Object>`
   - `options.name <String>`: Optionally get data for specific storm by name if it exists
   - `options.basin <String>`: Specify basin. `'at'` for Atlantic, `'ep'` for Eastern Pacific or `'cp'` for Centeral Pacific. (Optional, default `'at'`)
-  - `options.exampleData <Boolean>`: Fetch data from the example RSS feed for testing. (Otional, default `false`)
+  - `options.exampleData <Boolean>`: Fetch data from the example RSS feed for testing. (Optional, default `false`)
 
 If no options are passed, it will fetch all active storms in the Atlantic basin.
 
@@ -66,16 +66,34 @@ async function getBestTrack() {
 
   const bestTrack = await ibis.get.bestTrack();
   // returns {name: [String], date: [pubDate], fetchGIS: [Function] }
-  // if more than one active storm, returns array [{name, date, fetchGIS}, { ... }]
 
   const data = await bestTrack.fetchGIS();
-  // returns geoJSON array of FeatureCollections
+  // returns geoJSON array of FeatureCollections:
+  /**
+    [ 
+      { type: 'FeatureCollection',
+    features: [ [Object], [Object] ],
+    fileName: 'al012013.002_5day_lin',
+    pubDate: 'Thu, 06 Jun 2013 02:32:31 GMT' },
+    { type: 'FeatureCollection',
+    features: [ [Object], [Object] ],
+    fileName: 'al012013.002_5day_pgn',
+    pubDate: 'Thu, 06 Jun 2013 02:32:31 GMT' },
+    ...
+    ]
+    */
 }
 ```
 
 #### get
 
 All methods are asynchronous, returning a `<Promise>`.
+
+**Methods**
+- `forecast()`: Forecast Track, Cone of Uncertainty, Watches/Warnings.
+- `bestTrack()`: Track, Points, and Wind Swath.
+- `windField()`: Initial and Forecast Surface Winds.
+- `stormSurge()`: Probabilistic Storm Surge 5ft
 
 Returns `<Object>`:
 ```
@@ -85,17 +103,13 @@ Returns `<Object>`:
   fetchGIS: <Function> @returns geoJSON array of FeatureCollections
 }
 ```
+#### fetchGIS
+Asynchronously fetches ZIP file from RSS feed and converts geoJSON.
 
-**Methods**
-- `forecast()`: Forecast Track, Cone of Uncertainty, Watches/Warnings.
-- `bestTrack()`: Track, Points, and Wind Swath.
-- `windField()`: Initial and Forecast Surface Winds.
-- `stormSurge()`: Probabilistic Storm Surge 5ft
-
-`[forecast, bestTrack, ...].fetchGIS() <Object>`: Fetches ZIP file from RSS feed and converts to array of geoJSON FeatureCollection.
+Returns `{Promise<Object>}`: array of FeatureCollections.
 
 #### Example
-```
+```js
 async function myFun() {
   const bestTrack = await ibis.get.bestTrack();
 
