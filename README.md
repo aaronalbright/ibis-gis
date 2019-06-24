@@ -9,7 +9,7 @@ This one gets hurricane GIS data from the [National Hurricane Center](1) in geoJ
 
 The NHC provides an easy-to-access RSS feed of its GIS products that is updated regularly during an active storm. This tool allows for automating the fetching process in addiition to converting the `.shp` ZIP files into array of geoJSON FeatureCollections.
 
-Ibis attempts to be as unopinionated as possible. It doesn't change any properties or names of the GIS data. It only assumes you want a spefific shapefile.
+Ibis attempts to be as unopinionated as possible. It doesn't change any properties or names of the GIS data. It does not format times or timezones. It only assumes you want a spefific shapefile.
 
 It uses asynchronous functions to limit how often it has to download new files. You can frequently check shapefiles for updated data without downloading the file every time.
 
@@ -46,7 +46,7 @@ async function getForecast() {
 #### Parameters
 
 - `options <Object>`
-  - `options.name <String>`: Optionally get data for specific storm by name if it exists
+  - `options.name <String>`: Optionally get data for specific storm by name if it exists. Case insensitive.
   - `options.basin <String>`: Specify basin. `'at'` for Atlantic, `'ep'` for Eastern Pacific or `'cp'` for Centeral Pacific. (Optional, default `'at'`)
   - `options.exampleData <Boolean>`: Fetch data from the example RSS feed for testing. (Optional, default `false`)
 
@@ -68,31 +68,20 @@ async function getBestTrack() {
   /** returns 
    * {
       name: [String],
-      date: [pubDate],
+      date: [String],
       fetchGIS: [Function]
     }
   */
 
   const data = await bestTrack.fetchGIS();
-  /** returns geoJSON array of FeatureCollections:
-   * [ 
-      { type: 'FeatureCollection',
-    features: [ [Object], [Object] ],
-    fileName: 'al012013.002_5day_lin',
-    pubDate: 'Thu, 06 Jun 2013 02:32:31 GMT' },
-    { type: 'FeatureCollection',
-    features: [ [Object], [Object] ],
-    fileName: 'al012013.002_5day_pgn',
-    pubDate: 'Thu, 06 Jun 2013 02:32:31 GMT' },
-    ...
-    ]
-  */
 }
 ```
 
 #### get
 
-All methods are asynchronous, returning a `<Promise>`.
+Gets shapefile matching the selected method of the first (or only) storm.
+
+All methods are asynchronous.
 
 **Methods**
 - `forecast()`: Forecast Track, Cone of Uncertainty, Watches/Warnings.
@@ -100,7 +89,7 @@ All methods are asynchronous, returning a `<Promise>`.
 - `windField()`: Initial and Forecast Surface Winds.
 - `stormSurge()`: Probabilistic Storm Surge 5ft
 
-Returns `<Object>`:
+Returns `Promise<Object>`:
 ```
 {
   name: <String> - Storm name for the shapefile,
@@ -108,6 +97,7 @@ Returns `<Object>`:
   fetchGIS: <Function> @returns geoJSON array of FeatureCollections
 }
 ```
+
 #### fetchGIS
 Asynchronously fetches ZIP file from RSS feed and converts geoJSON.
 
@@ -116,13 +106,44 @@ Returns `Promise<Object>`: Array of FeatureCollections with `fileName` and `pubD
 #### Example
 ```js
 async function getStormSurge() {
+  // Active storm, Atlantic basin
+  const ibis = new Ibis();
+
   const bestTrack = await ibis.get.stormSurge();
 
-  const jsonData = await bestTrack.stormSurge();
+  const jsonData = await bestTrack.fetchGIS();
+  /** returns geoJSON array of FeatureCollections:
+   * [ 
+      { type: 'FeatureCollection',
+      features: [ [Object], [Object] ],
+      fileName: 'al012013.002_5day_lin',
+      pubDate: 'Thu, 06 Jun 2013 02:32:31 GMT' },
+      { type: 'FeatureCollection',
+      features: [ [Object], [Object] ],
+      fileName: 'al012013.002_5day_pgn',
+      pubDate: 'Thu, 06 Jun 2013 02:32:31 GMT' },
+      ...
+    ]
+  */
 }
 ```
 
+#### getAll
 
+The same methods as **`get`**. Useful when more than one active storms are found. Methods will return an array containing objects for each storm.
+#### Example
+```js
+async function myFunc() {
+  // More than one active storm, East Pacific basin
+  const ibis = new Ibis({
+    basin: 'ep'
+  });
+
+  const bestTrack = await ibis.getAll.stormSurge();
+
+  const publishDate = await bestTrack[1].date;
+}
+```
 
 
 [1]: https://www.nhc.noaa.gov/
