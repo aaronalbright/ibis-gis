@@ -20,7 +20,7 @@ function _ref() {
   _ref = _asyncToGenerator(
   /*#__PURE__*/
   _regeneratorRuntime.mark(function _callee(basin, example) {
-    var feed, res, xmlData, _parser$parse, rss, items;
+    var feed, res, xmlData, _parser$parse, rss, items, shps;
 
     return _regeneratorRuntime.wrap(function _callee$(_context) {
       while (1) {
@@ -38,12 +38,23 @@ function _ref() {
           case 6:
             xmlData = _context.sent;
             _parser$parse = parser.parse(xmlData), rss = _parser$parse.rss;
-            items = rss.channel.item;
-            return _context.abrupt("return", items.filter(function (d) {
-              return d.title.includes('[shp]');
-            }));
+            items = rss.channel.item; // Throws when the feed only has one result (no GIS products)
+            // Usually, this is for offseason or when there are no active storms
 
-          case 10:
+            if (items.length) {
+              _context.next = 11;
+              break;
+            }
+
+            throw new Error(items.title);
+
+          case 11:
+            shps = items.filter(function (d) {
+              return d.title.includes('[shp]');
+            });
+            return _context.abrupt("return", shps);
+
+          case 13:
           case "end":
             return _context.stop();
         }
@@ -53,7 +64,7 @@ function _ref() {
   return _ref.apply(this, arguments);
 }
 
-function fetchGIS (_ref) {
+function formatGIS (_ref) {
   var link = _ref.link,
       pubDate = _ref.pubDate;
   return (
@@ -97,26 +108,41 @@ function fetchGIS (_ref) {
   );
 }
 
+function fetchData (shps, filterVal) {
+  var gis = shps.filter(function (d) {
+    return d.title.includes(filterVal);
+  });
+  var r = /[A-Z]+\b/g;
+  return gis.map(function (d) {
+    var stormName = d.title.match(r);
+    return {
+      name: stormName[0],
+      date: d.pubDate,
+      fetchGIS: formatGIS(d)
+    };
+  });
+}
+
+/** @lends Ibis */
+
 var items = {
   forecast: 'Forecast',
   bestTrack: 'Preliminary Best Track',
   windField: 'Advisory Wind Field',
   stormSurge: 'Probabilistic Storm Surge 5ft'
 };
-
-var Ibis =
 /**
- * Gets hurricane GIS data as geoJSON
- * @param {Object} [opts] - Options for getting data
- * @param {string}  [opts.name] - Name of storm to get GIS data. Must exist in NHC feed.
- * @param {string} [opts.basin] - Either 'at' for Atlantic or 'ep' for Eastern Pacific
- * @param {boolean} [opts.exampleData] - Used to get example active storm data
- */
-function Ibis() {
+   * Gets hurricane GIS data as geoJSON
+   * @param {object} [options]
+   * @param {String}  [options.name] - Optionally get data for specific storm by name if it exists
+   * @param {String} [options.basin=at] - Specify basin
+   * @param {Boolean} [options.exampleData=false] - Used to get active storm data from example RSS feed
+   */
+
+var Ibis = function Ibis(_ref) {
   var _this = this;
 
-  var _ref = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {},
-      name = _ref.name,
+  var _name = _ref.name,
       _ref$basin = _ref.basin,
       basin = _ref$basin === void 0 ? 'at' : _ref$basin,
       _ref$exampleData = _ref.exampleData,
@@ -124,13 +150,13 @@ function Ibis() {
 
   _classCallCheck(this, Ibis);
 
-  _defineProperty(this, "find", function (filterVal) {
+  _defineProperty(this, "init", function (filterVal) {
     return (
       /*#__PURE__*/
       _asyncToGenerator(
       /*#__PURE__*/
       _regeneratorRuntime.mark(function _callee() {
-        var shps, gis, r, stormName;
+        var shps, name, data;
         return _regeneratorRuntime.wrap(function _callee$(_context) {
           while (1) {
             switch (_context.prev = _context.next) {
@@ -141,41 +167,33 @@ function Ibis() {
               case 2:
                 shps = _context.sent;
 
-                if (_this.name) {
-                  shps = shps.filter(function (d) {
-                    return d.title.includes(_this.name.toUpperCase());
-                  });
-                  console.log(shps.length);
-                }
-
-                gis = shps.filter(function (d) {
-                  return d.title.includes(filterVal);
-                });
-                r = /[A-Z]+\b/g;
-
-                if (!(gis.length === 1)) {
-                  _context.next = 11;
+                if (!_this.name) {
+                  _context.next = 8;
                   break;
                 }
 
-                stormName = gis[0].title.match(r);
-                return _context.abrupt("return", {
-                  name: stormName[0],
-                  date: gis[0].pubDate,
-                  fetchGIS: fetchGIS(gis[0])
+                name = _this.name.toUpperCase();
+                shps = shps.filter(function (d) {
+                  return d.title.includes(name);
                 });
 
-              case 11:
-                return _context.abrupt("return", gis.map(function (d) {
-                  var stormName = d.title.match(r);
-                  return {
-                    name: stormName[0],
-                    date: d.pubDate,
-                    fetchGIS: fetchGIS(d)
-                  };
-                }));
+                if (!(shps.length < 1)) {
+                  _context.next = 8;
+                  break;
+                }
 
-              case 12:
+                throw new Error("".concat(name, " does not exist in the active storms feed."));
+
+              case 8:
+                data = fetchData(shps, filterVal); // No array when only one storm to simply output
+
+                if (data.length == 1) {
+                  data = data[0];
+                }
+
+                return _context.abrupt("return", data);
+
+              case 11:
               case "end":
                 return _context.stop();
             }
@@ -186,10 +204,10 @@ function Ibis() {
   });
 
   _defineProperty(this, "get", mapValues(items, function (m) {
-    return _this.find(m);
+    return _this.init(m);
   }));
 
-  this.name = name;
+  this.name = _name;
   this.basin = basin;
   this.example = exampleData;
 };

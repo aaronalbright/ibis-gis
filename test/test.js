@@ -1,17 +1,17 @@
 const Ibis = require('../dist');
-const fs = require('fs-extra');
 
-const file = './.tmp/forecast.json';
+async function getForecast() {
+  const ibis = new Ibis({
+    exampleData: true
+  });
 
-async function myFunc() {
-  const ibis = new Ibis({ exampleData: true });
+  const forecast = await ibis.get.forecast();
 
-  let forecast = await ibis.get.forecast();
+  console.log(forecast);
+  
 
-  let gis = await forecast.fetchGIS();
-
-  await fs.outputJSON(file, gis, {spaces: 2});
-
+  const data = await forecast.fetchGIS();
+  
 }
 
-myFunc().catch(console.error);
+getForecast().catch(console.error);

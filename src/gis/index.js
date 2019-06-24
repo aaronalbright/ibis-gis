@@ -1,14 +1,16 @@
-import fetch from 'node-fetch';
-import shp from 'shpjs';
+import formatGIS from './_formatGIS';
 
-export default function({ link, pubDate }) {
-  return async function() {
-    const res = await fetch(link);
-    const buffer = await res.buffer();
-    const json = await shp(buffer);
-    return json.map(d => ({
-      ...d,
-      pubDate: pubDate
-    }));
-  };
+export default function(shps, filterVal) {
+  const gis = shps.filter(d => d.title.includes(filterVal));
+
+  let r = /[A-Z]+\b/g;
+
+  return gis.map(d => {
+    let stormName = d.title.match(r);
+    return {
+      name: stormName[0],
+      date: d.pubDate,
+      fetchGIS: formatGIS(d)
+    };
+  });
 }

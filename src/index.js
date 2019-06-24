@@ -1,8 +1,9 @@
 import mapValues from 'lodash/mapValues';
 
 import parseRSS from './rss';
-import fetchGIS from './gis';
+import fetchData from './gis';
 
+// filter methods mapped to `ibis.get`
 const items = {
   forecast: 'Forecast',
   bestTrack: 'Preliminary Best Track',
@@ -10,75 +11,43 @@ const items = {
   stormSurge: 'Probabilistic Storm Surge 5ft'
 };
 
-const names = [
-  'Andrea',
-  'Barry',
-  'Chantal',
-  'Dorian',
-  'Erin',
-  'Fernand',
-  'Gabrielle',
-  'Humberto',
-  'Imelda',
-  'Jerry',
-  'Karen',
-  'Lorenzo',
-  'Melissa',
-  'Nestor',
-  'Olga',
-  'Pablo',
-  'Rebekah',
-  'Sebastien',
-  'Tanya',
-  'Van',
-  'Wendy'
-];
-
-class Ibis {
-  /**
+/**
    * Gets hurricane GIS data as geoJSON
-   * @param {Object} [opts] - Options for getting data
-   * @param {string}  [opts.name] - Name of storm to get GIS data. Must exist in NHC feed.
-   * @param {string} [opts.basin] - Either 'at' for Atlantic or 'ep' for Eastern Pacific
-   * @param {boolean} [opts.exampleData] - Used to get example active storm data
+   * @param {object} [options]
+   * @param {String}  [options.name] - Optionally get data for specific storm by name if it exists
+   * @param {String} [options.basin=at] - Specify basin
+   * @param {Boolean} [options.exampleData=false] - Used to get active storm data from example RSS feed
    */
-  constructor({name, basin = 'at', exampleData = false } = {}) {
+class Ibis {
+  constructor({ name, basin = 'at', exampleData = false }) {
     this.name = name;
     this.basin = basin;
     this.example = exampleData;
-
   }
 
-  find = filterVal => async () => {
-    let shps = await parseRSS(this.basin, this.example);
-    if (this.name) {
-      shps = shps.filter(d => d.title.includes(this.name.toUpperCase()));
-      console.log(shps.length);
-    }
-    const gis = shps.filter(d => d.title.includes(filterVal));
+  init = filterVal => {
+    return async () => {
+      let shps = await parseRSS(this.basin, this.example);
+      if (this.name) {
+        let name = this.name.toUpperCase();
+        shps = shps.filter(d => d.title.includes(name));
+        if (shps.length < 1) {
+          throw new Error(`${name} does not exist in the active storms feed.`);
+        }
+      }
 
-    let r = /[A-Z]+\b/g;
-
-    if (gis.length === 1) {
-      let stormName = gis[0].title.match(r);
-      return {
-        name: stormName[0],
-        date: gis[0].pubDate,
-        fetchGIS: fetchGIS(gis[0])
-      };
-    } else {
-      return gis.map(d => {
-        let stormName = d.title.match(r);
-        return {
-          name: stormName[0],
-          date: d.pubDate,
-          fetchGIS: fetchGIS(d)
-        };
-      });
-    }
+      let data = fetchData(shps, filterVal);
+      
+      // No array when only one storm to simply output
+      if (data.length == 1) {
+        data = data[0]
+      }
+      
+      return data;
+    };
   };
-
-  get = mapValues(items, m => this.find(m));
+  
+  get = mapValues(items, m => this.init(m));
 }
 
 module.exports = Ibis;
