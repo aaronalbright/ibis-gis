@@ -25,8 +25,6 @@ yarn add node-ibis
 
 ## Usage
 
-__Active Storm(s)__
-
 ```js
 import Ibis from 'node-ibis'
 
@@ -47,7 +45,7 @@ async function getForecast() {
 
 - `options <Object>`
   - `options.name <String>`: Optionally get data for specific storm by name if it exists. Case insensitive.
-  - `options.basin <String>`: Specify basin. `'at'` for Atlantic, `'ep'` for Eastern Pacific or `'cp'` for Centeral Pacific. (Optional, default `'at'`)
+  - `options.basin <String>`: Specify basin feed. Possible values: `at, ep, cp` for Atlantic,  Eastern Pacific or Centeral Pacific, respectively. (Optional, default `'at'`)
   - `options.exampleData <Boolean>`: Fetch data from the example RSS feed for testing. (Optional, default `false`)
 
 If no options are passed, it will fetch all active storms in the Atlantic basin.
