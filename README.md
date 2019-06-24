@@ -65,12 +65,17 @@ async function getBestTrack() {
   });
 
   const bestTrack = await ibis.get.bestTrack();
-  // returns {name: [String], date: [pubDate], fetchGIS: [Function] }
+  /** returns 
+   * {
+      name: [String],
+      date: [pubDate],
+      fetchGIS: [Function]
+    }
+  */
 
   const data = await bestTrack.fetchGIS();
-  // returns geoJSON array of FeatureCollections:
-  /**
-    [ 
+  /** returns geoJSON array of FeatureCollections:
+   * [ 
       { type: 'FeatureCollection',
     features: [ [Object], [Object] ],
     fileName: 'al012013.002_5day_lin',
@@ -81,7 +86,7 @@ async function getBestTrack() {
     pubDate: 'Thu, 06 Jun 2013 02:32:31 GMT' },
     ...
     ]
-    */
+  */
 }
 ```
 
@@ -106,14 +111,14 @@ Returns `<Object>`:
 #### fetchGIS
 Asynchronously fetches ZIP file from RSS feed and converts geoJSON.
 
-Returns `{Promise<Object>}`: array of FeatureCollections.
+Returns `Promise<Object>`: Array of FeatureCollections with `fileName` and `pubData`.
 
 #### Example
 ```js
-async function myFun() {
-  const bestTrack = await ibis.get.bestTrack();
+async function getStormSurge() {
+  const bestTrack = await ibis.get.stormSurge();
 
-  const jsonData = await bestTrack.fetchGIS();
+  const jsonData = await bestTrack.stormSurge();
 }
 ```
 
