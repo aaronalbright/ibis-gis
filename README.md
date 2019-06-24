@@ -11,7 +11,7 @@ The NHC provides an easy-to-access RSS feed of its GIS products that is updated 
 
 Ibis attempts to be as unopinionated as possible. It doesn't change any properties or names of the GIS data. It does not format times or timezones. It only assumes you want a spefific shapefile.
 
-It uses asynchronous functions to limit how often it has to download new files. You can frequently check shapefiles for updated data without downloading the file every time.
+It uses asynchronous functions to limit how often it has to download new files. You can frequently check shapefiles for updated data without downloading the file every time!
 
 ## Install
 __npm__
