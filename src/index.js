@@ -38,12 +38,7 @@ class Ibis {
 
       let data = fetchData(shps, filterVal);
       
-      // No array when only one storm to simply output
-      if (!all) {
-        data = data[0]
-      }
-      
-      return data;
+      return all ? data : data[0];
     };
   };
   

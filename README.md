@@ -7,7 +7,7 @@ This one gets hurricane GIS data from the [National Hurricane Center](1) in geoJ
 
 ## Why? 
 
-The NHC provides an easy-to-access RSS feed of its GIS products that is updated regularly during an active storm. This tool allows for automating the fetching process in addiition to converting the `.shp` ZIP files into array of geoJSON FeatureCollections.
+The NHC provides an easy-to-access RSS feed of its GIS products that is updated regularly during an active storm. This tool allows for automating the fetching process in addiition to converting the `.shp` ZIP files into an array of geoJSON FeatureCollections.
 
 Ibis attempts to be as unopinionated as possible. It doesn't change any properties or names of the GIS data. It does not format times or timezones. It only assumes you want a spefific shapefile.
 

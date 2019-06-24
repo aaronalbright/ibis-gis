@@ -119,8 +119,6 @@ function fetchData (shps, filterVal) {
   });
 }
 
-/** @lends Ibis */
-
 var items = {
   forecast: 'Forecast',
   bestTrack: 'Preliminary Best Track',
@@ -146,7 +144,7 @@ var Ibis = function Ibis(_ref) {
 
   _classCallCheck(this, Ibis);
 
-  _defineProperty(this, "init", function (filterVal) {
+  _defineProperty(this, "init", function (filterVal, all) {
     return (
       /*#__PURE__*/
       _asyncToGenerator(
@@ -181,15 +179,10 @@ var Ibis = function Ibis(_ref) {
                 throw new Error("".concat(name, " does not exist in the active storms feed."));
 
               case 8:
-                data = fetchData(shps, filterVal); // No array when only one storm to simply output
+                data = fetchData(shps, filterVal);
+                return _context.abrupt("return", all ? data : data[0]);
 
-                if (data.length == 1) {
-                  data = data[0];
-                }
-
-                return _context.abrupt("return", data);
-
-              case 11:
+              case 10:
               case "end":
                 return _context.stop();
             }
@@ -200,7 +193,11 @@ var Ibis = function Ibis(_ref) {
   });
 
   _defineProperty(this, "get", mapValues(items, function (m) {
-    return _this.init(m);
+    return _this.init(m, false);
+  }));
+
+  _defineProperty(this, "getAll", mapValues(items, function (m) {
+    return _this.init(m, true);
   }));
 
   this.name = _name;
