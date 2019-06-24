@@ -2,11 +2,11 @@
 
 According to legend, the ibis is the last sign of wildlife to take shelter before a hurricane hits and the first to reappear once the storm has passed.
 
-This one gets hurricane GIS data from the [National Hurricane Center](https://www.nhc.noaa.gov/) in geoJSON format.
+This one gets hurricane GIS data from the [National Hurricane Center](https://www.nhc.noaa.gov/) in GeoJSON format.
 
 ## Why? 
 
-The NHC provides an easy-to-access RSS feed of its GIS products that are updated regularly during an active storm. This tool allows for automating the fetching process in addition to converting the `.shp` ZIP files into an array of geoJSON FeatureCollections.
+The NHC provides an easy-to-access RSS feed of its GIS products that are updated regularly during an active storm. This tool allows for automating the fetching process in addition to converting the `.shp` ZIP files into an array of GeoJSON FeatureCollections.
 
 Ibis attempts to be as unopinionated as possible. It doesn't change any properties or names of the GIS data. It does not format times or time zones. It only assumes you want a specific shapefile.
 
@@ -91,12 +91,12 @@ Returns `Promise<Object>`:
 {
   name: <String> - Storm name for the shapefile,
   date: <String> - Last published date for the shapefile
-  fetchGIS: <Function> @returns geoJSON array of FeatureCollections
+  fetchGIS: <Function> @returns GeoJSON array of FeatureCollections
 }
 ```
 
 #### fetchGIS
-Asynchronously fetches ZIP file from RSS feed and converts geoJSON.
+Asynchronously fetches ZIP file from RSS feed and converts GeoJSON.
 
 Returns `Promise<Object>`: Array of FeatureCollections with `fileName` and `pubData`.
 
@@ -109,7 +109,7 @@ async function getStormSurge() {
   const bestTrack = await ibis.get.stormSurge();
 
   const jsonData = await bestTrack.fetchGIS();
-  /** returns geoJSON array of FeatureCollections:
+  /** returns GeoJSON array of FeatureCollections:
    * [ 
       { type: 'FeatureCollection',
       features: [ [Object], [Object] ],
