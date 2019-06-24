@@ -25,7 +25,7 @@ class Ibis {
     this.example = exampleData;
   }
 
-  init = filterVal => {
+  init = (filterVal, all) => {
     return async () => {
       let shps = await parseRSS(this.basin, this.example);
       if (this.name) {
@@ -39,7 +39,7 @@ class Ibis {
       let data = fetchData(shps, filterVal);
       
       // No array when only one storm to simply output
-      if (data.length == 1) {
+      if (!all) {
         data = data[0]
       }
       
@@ -47,7 +47,8 @@ class Ibis {
     };
   };
   
-  get = mapValues(items, m => this.init(m));
+  get = mapValues(items, m => this.init(m, false));
+  getAll = mapValues(items, m => this.init(m, true));
 }
 
 module.exports = Ibis;
