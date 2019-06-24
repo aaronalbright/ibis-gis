@@ -3,7 +3,7 @@
 
 According to legend, the ibis is the last sign of wildlife to take shelter before a hurricane hits and the first to reappear once the storm has passed.
 
-This one gets hurricane GIS data from the [National Hurricane Center](1) in geoJSON format.
+This one gets hurricane GIS data from the [National Hurricane Center](https://www.nhc.noaa.gov/) in geoJSON format.
 
 ## Why? 
 
@@ -142,6 +142,3 @@ async function myFunc() {
   const publishDate = await bestTrack[1].date;
 }
 ```
-
-
-[1]: https://www.nhc.noaa.gov/
