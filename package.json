@@ -1,7 +1,7 @@
 {
-  "name": "ibis",
+  "name": "node-ibis",
   "version": "1.0.0",
-  "description": "Node NHC scraper",
+  "description": "Node hurricane GIS shapefile converter",
   "main": "dist/index.js",
   "module": "dist/module.js",
   "author": "Aaron Albright",
