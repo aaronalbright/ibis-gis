@@ -1,7 +1,11 @@
 {
-  "name": "node-ibis",
+  "name": "ibis-gis",
   "version": "1.0.0",
   "description": "Node hurricane GIS shapefile converter",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/aaronalbright/ibis-gis.git"
+  },
   "main": "dist/index.js",
   "module": "dist/module.js",
   "author": "Aaron Albright",
