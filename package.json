@@ -6,7 +6,6 @@
   "module": "dist/module.js",
   "author": "Aaron Albright",
   "license": "MIT",
-  "private": true,
   "devDependencies": {
     "@babel/core": "^7.4.5",
     "@babel/plugin-proposal-class-properties": "^7.4.4",
