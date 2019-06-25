@@ -15,17 +15,17 @@ It uses asynchronous functions to limit how often it has to download new files. 
 ## Install
 __npm__
 ```
-npm install node-ibis
+npm install ibis-gis
 ```
 __Yarn__
 ```
-yarn add node-ibis
+yarn add ibis-gis
 ```
 
 ## Usage
 
 ```js
-import Ibis from 'node-ibis'
+import Ibis from 'ibis-gis'
 
 async function getForecast() {
   const ibis = new Ibis();
@@ -52,7 +52,7 @@ If no options are passed, it will fetch all active storms in the Atlantic basin.
 #### Example
 
 ```js
-import Ibis from 'node-ibis'
+import Ibis from 'ibis-gis'
 
 async function getBestTrack() {
   // Example storm, known name
