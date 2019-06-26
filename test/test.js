@@ -5,13 +5,11 @@ async function getForecast() {
     exampleData: true
   });
 
-  const forecast = await ibis.get.forecast();
-
-  console.log(forecast);
+  const stormSurge = await ibis.get.stormSurge();
+  console.log(stormSurge);
   
-
-  const data = await forecast.fetchGIS();
-  
+  const data = await stormSurge.fetchGIS();
+  console.log(data);
 }
 
 getForecast().catch(console.error);

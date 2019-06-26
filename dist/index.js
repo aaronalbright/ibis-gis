@@ -92,13 +92,23 @@ function formatGIS (_ref) {
 
             case 8:
               json = _context.sent;
+
+              if (!json.length) {
+                _context.next = 13;
+                break;
+              }
+
               return _context.abrupt("return", json.map(function (d) {
                 return _objectSpread({}, d, {
                   pubDate: pubDate
                 });
               }));
 
-            case 10:
+            case 13:
+              json.pubDate = pubDate;
+              return _context.abrupt("return", json);
+
+            case 15:
             case "end":
               return _context.stop();
           }
