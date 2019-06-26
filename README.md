@@ -69,8 +69,9 @@ async function getBestTrack() {
       fetchGIS: [Function]
     }
   */
-
-  const data = await bestTrack.fetchGIS();
+ 
+  const date = await bestTrack.date;
+  // 'Thu, 06 Jun 2013 02:32:31 GMT'
 }
 ```
 
@@ -102,25 +103,20 @@ Returns `Promise<Object>`: Array of FeatureCollections with `fileName` and `pubD
 
 #### Example
 ```js
-async function getStormSurge() {
+async function myFunc() {
   // Active storm, Atlantic basin
   const ibis = new Ibis();
 
-  const bestTrack = await ibis.get.stormSurge();
+  const stormSurge = await ibis.get.stormSurge();
 
-  const jsonData = await bestTrack.fetchGIS();
-  /** returns GeoJSON array of FeatureCollections:
-   * [ 
-      { type: 'FeatureCollection',
-      features: [ [Object], [Object] ],
-      fileName: 'al012013.002_5day_lin',
-      pubDate: 'Thu, 06 Jun 2013 02:32:31 GMT' },
-      { type: 'FeatureCollection',
-      features: [ [Object], [Object] ],
-      fileName: 'al012013.002_5day_pgn',
-      pubDate: 'Thu, 06 Jun 2013 02:32:31 GMT' },
-      ...
-    ]
+  const jsonData = await bestTrack.stormSurge();
+  /** returns
+   * { 
+   *  type: 'FeatureCollection',
+   *  features: [ [Object], [Object], ...],
+   *  fileName: 'al012013_2013060706_gt5',
+   *  pubDate: 'Thu, 06 Jun 2013 02:49:27 GMT' 
+     }
   */
 }
 ```
@@ -136,8 +132,8 @@ async function myFunc() {
     basin: 'ep'
   });
 
-  const bestTrack = await ibis.getAll.stormSurge();
+  const windField = await ibis.getAll.windField();
 
-  const publishDate = await bestTrack[1].date;
+  const stormName = await windField[1].name;
 }
 ```
