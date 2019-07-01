@@ -16,7 +16,7 @@
     "plugins": ["babel"],
     "rules": {
         "semi":"warn",
-        "no-console": "off",
+        "no-console": "warn",
         "no-unused-vars": "warn"
     }
 }

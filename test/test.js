@@ -2,14 +2,11 @@ const Ibis = require('../dist');
 
 async function getForecast() {
   const ibis = new Ibis({
-    exampleData: true
+    basin: 'ep'
   });
 
-  const stormSurge = await ibis.get.stormSurge();
+  const stormSurge = await ibis.get.forecast();
   console.log(stormSurge);
-  
-  const data = await stormSurge.fetchGIS();
-  console.log(data);
 }
 
 getForecast().catch(console.error);

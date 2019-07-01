@@ -39,7 +39,7 @@ function _ref() {
             xmlData = _context.sent;
             _parser$parse = parser.parse(xmlData), rss = _parser$parse.rss;
             items = rss.channel.item; // Throws when the feed only has one result (no GIS products)
-            // Usually, this is for offseason or when there are no active storms
+            // Usually, this is for off-season or when there are no active storms
 
             if (items.length) {
               _context.next = 11;
@@ -121,8 +121,9 @@ function formatGIS (_ref) {
 function fetchData (shps, filterVal) {
   var gis = shps.filter(function (d) {
     return d.title.includes(filterVal);
-  });
-  var r = /[A-Z]+\b/g;
+  }); // matches first word before a SPACE and (
+
+  var r = /(\w+)(?= \()/g;
   return gis.map(function (d) {
     var stormName = d.title.match(r);
     return {
@@ -141,7 +142,7 @@ var items = {
 };
 /**
    * Gets hurricane GIS data as geoJSON
-   * @param {object} [options]
+   * @param {Object} options
    * @param {String}  [options.name] - Optionally get data for specific storm by name if it exists
    * @param {String} [options.basin=at] - Specify basin
    * @param {Boolean} [options.exampleData=false] - Used to get active storm data from example RSS feed
@@ -180,9 +181,9 @@ var Ibis = function Ibis(_ref) {
                   break;
                 }
 
-                name = _this.name.toUpperCase();
+                name = _this.name.toLowerCase();
                 shps = shps.filter(function (d) {
-                  return d.title.includes(name);
+                  return d.title.toLowerCase().includes(name);
                 });
 
                 if (!(shps.length < 1)) {
@@ -190,7 +191,7 @@ var Ibis = function Ibis(_ref) {
                   break;
                 }
 
-                throw new Error("".concat(name, " does not exist in the active storms feed."));
+                throw new Error("\"".concat(_this.name, "\" does not exist in the active storms feed."));
 
               case 8:
                 data = fetchData(shps, filterVal);

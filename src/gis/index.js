@@ -3,7 +3,8 @@ import formatGIS from './_formatGIS';
 export default function(shps, filterVal) {
   const gis = shps.filter(d => d.title.includes(filterVal));
 
-  let r = /[A-Z]+\b/g;
+  // matches first word before a SPACE and (
+  let r = /(\w+)(?= \()/g;
 
   return gis.map(d => {
     let stormName = d.title.match(r);

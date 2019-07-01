@@ -13,7 +13,7 @@ const items = {
 
 /**
    * Gets hurricane GIS data as geoJSON
-   * @param {object} [options]
+   * @param {Object} options
    * @param {String}  [options.name] - Optionally get data for specific storm by name if it exists
    * @param {String} [options.basin=at] - Specify basin
    * @param {Boolean} [options.exampleData=false] - Used to get active storm data from example RSS feed
@@ -29,13 +29,13 @@ class Ibis {
     return async () => {
       let shps = await parseRSS(this.basin, this.example);
       if (this.name) {
-        let name = this.name.toUpperCase();
-        shps = shps.filter(d => d.title.includes(name));
+        let name = this.name.toLowerCase();
+        shps = shps.filter(d => d.title.toLowerCase().includes(name));
         if (shps.length < 1) {
-          throw new Error(`${name} does not exist in the active storms feed.`);
+          throw new Error(`"${this.name}" does not exist in the active storms feed.`);
         }
       }
-
+      
       let data = fetchData(shps, filterVal);
       
       return all ? data : data[0];

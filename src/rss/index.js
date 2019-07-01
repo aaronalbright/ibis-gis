@@ -14,7 +14,7 @@ export default async function(basin, example) {
   let items = rss.channel.item;
 
   // Throws when the feed only has one result (no GIS products)
-  // Usually, this is for offseason or when there are no active storms
+  // Usually, this is for off-season or when there are no active storms
   if (!items.length) {
     throw new Error(items.title)
   }
