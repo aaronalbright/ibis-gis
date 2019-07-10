@@ -19,7 +19,7 @@ const items = {
    * @param {Boolean} [options.exampleData=false] - Used to get active storm data from example RSS feed
    */
 class Ibis {
-  constructor({ name, basin = 'at', exampleData = false }) {
+  constructor({ name, basin = 'at', exampleData = false } = {}) {
     this.name = name;
     this.basin = basin;
     this.example = exampleData;

@@ -148,10 +148,11 @@ var items = {
    * @param {Boolean} [options.exampleData=false] - Used to get active storm data from example RSS feed
    */
 
-var Ibis = function Ibis(_ref) {
+var Ibis = function Ibis() {
   var _this = this;
 
-  var _name = _ref.name,
+  var _ref = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {},
+      _name = _ref.name,
       _ref$basin = _ref.basin,
       basin = _ref$basin === void 0 ? 'at' : _ref$basin,
       _ref$exampleData = _ref.exampleData,

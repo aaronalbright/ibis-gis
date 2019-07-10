@@ -1,12 +1,10 @@
 const Ibis = require('../dist');
 
-async function getForecast() {
-  const ibis = new Ibis({
-    basin: 'ep'
-  });
+async function testFunc() {
+  const ibis = new Ibis();
 
-  const stormSurge = await ibis.get.forecast();
-  console.log(stormSurge);
+  const forecast = await ibis.get.forecast();
+  console.log(forecast);
 }
 
-getForecast().catch(console.error);
+testFunc().catch(console.error);
