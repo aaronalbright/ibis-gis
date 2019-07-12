@@ -6,8 +6,9 @@ import fetchData from './gis';
 // filter methods mapped to `ibis.get`
 const items = {
   forecast: 'Forecast',
+  windSpeed: 'Wind Speed Probabilities',
   bestTrack: 'Preliminary Best Track',
-  windField: 'Advisory Wind Field',
+  windField: 'Wind Field',
   stormSurge: 'Probabilistic Storm Surge 5ft'
 };
 
@@ -28,6 +29,7 @@ class Ibis {
   init = (filterVal, all) => {
     return async () => {
       let shps = await parseRSS(this.basin, this.example);
+      
       if (this.name) {
         let name = this.name.toLowerCase();
         shps = shps.filter(d => d.title.toLowerCase().includes(name));

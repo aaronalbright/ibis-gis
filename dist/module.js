@@ -117,11 +117,22 @@ function formatGIS (_ref) {
 function fetchData (shps, filterVal) {
   var gis = shps.filter(function (d) {
     return d.title.includes(filterVal);
-  }); // matches first word before a SPACE and (
+  });
+
+  if (gis.length < 1) {
+    throw new Error("Shapefile: \"".concat(filterVal, "\" not found. It may not exist yet. Check https://www.nhc.noaa.gov/gis/ to ensure that it does."));
+  } // matches first word before a SPACE and (
+
 
   var r = /(\w+)(?= \()/g;
   return gis.map(function (d) {
-    var stormName = d.title.match(r);
+    var stormName = d.title.match(r) || ['No data']; // Ensures wind speed always fetched the polygon shapefile, not the point shapefile
+
+    if (filterVal == 'Wind Speed Probabilities') {
+      d.link = d.link.replace('halfDeg', '5km');
+      console.log(d.link);
+    }
+
     return {
       name: stormName[0],
       date: d.pubDate,
@@ -132,8 +143,9 @@ function fetchData (shps, filterVal) {
 
 var items = {
   forecast: 'Forecast',
+  windSpeed: 'Wind Speed Probabilities',
   bestTrack: 'Preliminary Best Track',
-  windField: 'Advisory Wind Field',
+  windField: 'Wind Field',
   stormSurge: 'Probabilistic Storm Surge 5ft'
 };
 /**
