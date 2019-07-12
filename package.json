@@ -24,7 +24,7 @@
   "dependencies": {
     "@babel/runtime": "^7.4.5",
     "fast-xml-parser": "^3.12.16",
-    "lodash": "^4.17.11",
+    "lodash": "^4.17.14",
     "node-fetch": "^2.6.0",
     "shpjs": "^3.4.3"
   },
