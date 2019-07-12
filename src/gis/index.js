@@ -17,7 +17,6 @@ export default function(shps, filterVal) {
     // Ensures wind speed always fetched the polygon shapefile, not the point shapefile
     if (filterVal == 'Wind Speed Probabilities') {
       d.link = d.link.replace('halfDeg', '5km')
-      console.log(d.link);
     }
       return {
         name: stormName[0],
