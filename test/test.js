@@ -3,11 +3,11 @@ const Ibis = require('../dist');
 async function testFunc() {
   const ibis = new Ibis();
 
-  const data = await ibis.get.stormSurge();
-  console.log(data);
+  let custom = await ibis.fetch(
+    'https://www.nhc.noaa.gov/gis/forecast/archive/al052019_fcst_latest.zip'
+  );
 
-  const gis = await data.fetchGIS();
-  console.log(gis);
+  console.log(custom);
   
 }
 

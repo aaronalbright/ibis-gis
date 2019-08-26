@@ -13,11 +13,14 @@ export default function(shps, filterVal) {
   let r = /(\w+)(?= \()/g;
 
   return gis.map(d => {
-    let stormName = d.title.match(r) || ['No data']
+    let stormName = d.title.match(r) || [undefined]
     // Ensures wind speed always fetched the polygon shapefile, not the point shapefile
     if (filterVal == 'Wind Speed Probabilities') {
       d.link = d.link.replace('halfDeg', '5km')
     }
+
+    if (filterVal == 'Wind')
+
       return {
         name: stormName[0],
         date: d.pubDate,

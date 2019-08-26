@@ -16,10 +16,12 @@ export default async function(basin, example) {
   // Throws when the feed only has one result (no GIS products)
   // Usually, this is for off-season or when there are no active storms
   if (!items.length) {
-    throw new Error(items.title)
+    console.log(`Only one item found in feed: "${items.title}"`)
+    console.log('Exiting...');
+    process.exit();
   }
 
-  let shps = items.filter(d => d.title.includes('[shp]'))
+  let shps = items.filter(d => d.title.includes('[shp]'));
   
   return shps
 }
