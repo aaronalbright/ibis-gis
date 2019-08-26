@@ -19,8 +19,6 @@ export default function(shps, filterVal) {
       d.link = d.link.replace('halfDeg', '5km')
     }
 
-    if (filterVal == 'Wind')
-
       return {
         name: stormName[0],
         date: d.pubDate,
