@@ -31,18 +31,9 @@ class Ibis {
   init = (filterVal, all) => {
     return async () => {
       let shps = await parseRSS(this.basin, this.example);
+      let name = this.name ? this.name.toLowerCase() : undefined;
 
-      if (this.name) {
-        let name = this.name.toLowerCase();
-        shps = shps.filter(d => d.title.toLowerCase().includes(name));
-        if (shps.length < 1) {
-          throw new Error(
-            `"${this.name}" does not exist in the active storms feed.`
-          );
-        }
-      }
-
-      let data = fetchData(shps, filterVal);
+      let data = fetchData(shps, filterVal, name);
 
       return all ? data : data[0];
     };

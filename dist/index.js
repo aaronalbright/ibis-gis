@@ -76,25 +76,24 @@ function formatGIS (_ref) {
         while (1) {
           switch (_context.prev = _context.next) {
             case 0:
-              console.log(link);
-              _context.next = 3;
+              _context.next = 2;
               return fetch(link);
 
-            case 3:
+            case 2:
               res = _context.sent;
-              _context.next = 6;
+              _context.next = 5;
               return res.buffer();
 
-            case 6:
+            case 5:
               buffer = _context.sent;
-              _context.next = 9;
+              _context.next = 8;
               return shp(buffer);
 
-            case 9:
+            case 8:
               json = _context.sent;
 
               if (!json.length) {
-                _context.next = 14;
+                _context.next = 13;
                 break;
               }
 
@@ -104,11 +103,11 @@ function formatGIS (_ref) {
                 });
               }));
 
-            case 14:
+            case 13:
               json.pubDate = pubDate;
               return _context.abrupt("return", json);
 
-            case 16:
+            case 15:
             case "end":
               return _context.stop();
           }
@@ -118,13 +117,25 @@ function formatGIS (_ref) {
   );
 }
 
-function fetchData (shps, filterVal) {
-  var gis = shps.filter(function (d) {
-    return d.title.includes(filterVal);
-  });
+function fetchData (shps, filterVal, name) {
+  var gis;
+
+  if (name && filterVal !== 'Wind Speed Probabilities') {
+    gis = shps.filter(function (d) {
+      return d.title.toLowerCase().includes(name) && d.title.includes(filterVal);
+    });
+
+    if (gis.length < 1) {
+      console.error("\"".concat(name, "\" does not exist in the active storms feed."));
+    }
+  } else {
+    gis = shps.filter(function (d) {
+      return d.title.includes(filterVal);
+    });
+  }
 
   if (gis.length < 1) {
-    throw new Error("Shapefile: \"".concat(filterVal, "\" not found. It may not exist yet. Check https://www.nhc.noaa.gov/gis/ to ensure that it does."));
+    throw new Error("Shapefile: \"".concat(filterVal, "\" not found for storm \"").concat(name, "\". It may not exist yet. Check https://www.nhc.noaa.gov/gis/ to ensure that it does."));
   } // matches first word before a SPACE and (
 
 
@@ -134,6 +145,7 @@ function fetchData (shps, filterVal) {
 
     if (filterVal == 'Wind Speed Probabilities') {
       d.link = d.link.replace('halfDeg', '5km');
+      stormName = ['Wind Speed Probabilities'];
     }
 
     return {
@@ -190,29 +202,11 @@ function () {
 
                 case 2:
                   shps = _context.sent;
-
-                  if (!_this.name) {
-                    _context.next = 8;
-                    break;
-                  }
-
-                  name = _this.name.toLowerCase();
-                  shps = shps.filter(function (d) {
-                    return d.title.toLowerCase().includes(name);
-                  });
-
-                  if (!(shps.length < 1)) {
-                    _context.next = 8;
-                    break;
-                  }
-
-                  throw new Error("\"".concat(_this.name, "\" does not exist in the active storms feed."));
-
-                case 8:
-                  data = fetchData(shps, filterVal);
+                  name = _this.name ? _this.name.toLowerCase() : undefined;
+                  data = fetchData(shps, filterVal, name);
                   return _context.abrupt("return", all ? data : data[0]);
 
-                case 10:
+                case 6:
                 case "end":
                   return _context.stop();
               }

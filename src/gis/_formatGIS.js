@@ -3,8 +3,6 @@ import shp from 'shpjs';
 
 export default function({ link, pubDate }) {
   return async function() {
-    console.log(link);
-    
     const res = await fetch(link);
     const buffer = await res.buffer();
 
