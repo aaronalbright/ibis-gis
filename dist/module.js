@@ -142,11 +142,17 @@ function fetchData (shps, filterVal, name) {
     if (filterVal == 'Wind Speed Probabilities') {
       d.link = d.link.replace('halfDeg', '5km');
       stormName = ['Wind Speed Probabilities'];
+    } // Always fetches latest Wind Field
+
+
+    if (filterVal == 'Wind Field') {
+      d.link = d.link.replace(/(\d+).zip/, 'latest.zip');
     }
 
     return {
       name: stormName[0],
       date: d.pubDate,
+      fileName: d.link,
       fetchGIS: formatGIS(d)
     };
   });

@@ -1,17 +1,12 @@
 const Ibis = require('../dist');
 
 async function testFunc() {
-  const ibis = new Ibis();
+  const ibis = new Ibis({name: 'Isaias'});
 
-  let wind = await ibis.get.windSpeed();
-
-  let forecast = await ibis.get.forecast();
+  let wind = await ibis.get.windField();
 
   console.log(wind);
-  console.log(forecast);
-  
-  
-  
+
 }
 
 testFunc().catch(console.error);
