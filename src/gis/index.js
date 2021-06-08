@@ -1,20 +1,34 @@
 import formatGIS from './_formatGIS';
 
+const fileRef = {
+  forecast: 'Forecast',
+  windSpeed: 'Wind Speed Probabilities',
+  bestTrack: 'Preliminary Best Track',
+  windField: 'Wind Field',
+  stormSurge: 'Probabilistic Storm Surge 5ft'
+}
+
 export default function(shps, filterVal, name) {
   let gis;
 
   if (name && filterVal !== 'Wind Speed Probabilities') {
     gis = shps.filter(d => d.title.toLowerCase().includes(name) && d.title.includes(filterVal));
-    if (gis.length < 1) {
-      console.error(
-        `"${name}" does not exist in the active storms feed.`
-      );
-    }
   } else {
     gis = shps.filter(d => d.title.includes(filterVal));
   }
   
   if (gis.length < 1) {
+    if (filterVal == 'Forecast') {
+      let arr = shps.filter(d => d.title.includes('Summary'));
+      console.log(arr);
+      gis = [
+        {
+          name: name,
+          date: arr[0].pubDate
+        }
+      ]
+      console.log(gis);
+    }
     throw new Error(
       `Shapefile: "${filterVal}" not found for storm "${name}". It may not exist yet. Check https://www.nhc.noaa.gov/gis/ to ensure that it does.`
     );

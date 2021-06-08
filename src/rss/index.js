@@ -17,11 +17,10 @@ export default async function(basin, example) {
   // Usually, this is for off-season or when there are no active storms
   if (!items.length) {
     console.log(`Only one item found in feed: "${items.title}"`)
-    console.log('Exiting...');
-    process.exit();
+    throw new Error('No active storms found');
   }
 
-  let shps = items.filter(d => d.title.includes('[shp]'));
+  let shps = items.filter(d => d.title.includes('[shp]') || d.title.includes('Summary'));
   
   return shps
 }
