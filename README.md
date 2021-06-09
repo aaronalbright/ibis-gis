@@ -4,6 +4,8 @@ According to legend, the ibis is the last sign of wildlife to take shelter befor
 
 This one gets hurricane GIS data from the [National Hurricane Center](https://www.nhc.noaa.gov/) in GeoJSON format.
 
+**Requires Node 14 or higher**
+
 ## Why? 
 
 The NHC provides an easy-to-access RSS feed of its GIS products that are updated regularly during an active storm. This tool allows for automating the fetching process in addition to converting the `.shp` ZIP files into an array of GeoJSON FeatureCollections.

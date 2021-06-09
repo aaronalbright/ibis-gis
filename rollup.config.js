@@ -10,10 +10,10 @@ export default {
     { file: pkg.module, format: 'es' }
   ],
   plugins: [
-    // babel({
-    //   exclude: ['node_modules/**'],
-    //   babelHelpers: 'runtime'
-    // }),
+    babel({
+      exclude: ['node_modules/**'],
+      babelHelpers: 'runtime'
+    }),
     resolve({
       modulesOnly: true
     })

@@ -1,8 +1,9 @@
 {
-    "parser": "babel-eslint",
+    "parser": "@babel/eslint-parser",
     "env": {
         "es6": true,
-        "node": true
+        "node": true,
+        "es2020": true
     },
     "extends": "eslint:recommended",
     "globals": {
@@ -10,13 +11,11 @@
         "SharedArrayBuffer": "readonly"
     },
     "parserOptions": {
-        "ecmaVersion": 2018,
+        "ecmaVersion": 2020,
         "sourceType": "module"
     },
-    "plugins": ["babel"],
     "rules": {
-        "semi":"warn",
-        "no-console": "error",
+        "semi": [0, "always"],
         "no-unused-vars": "warn"
     }
 }

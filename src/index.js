@@ -28,6 +28,12 @@ class Ibis {
     this.example = exampleData;
   }
 
+  /**
+   * Init function to fetch data from shapefile
+   * @param {String} filterVal Sets shapefile to search for in CSS feed
+   * @param {Boolean} all
+   * @returns {(Array|Object)} Array of data objects or singular data object
+   */
   init = (filterVal, all) => {
     return async () => {
       let shps = await parseRSS(this.basin, this.example);
@@ -44,8 +50,9 @@ class Ibis {
 
   /**
    * Custom fetch when RSS doesn't have current URL
+   * @param {String} url URL from RSS feed or elsewhere
+   * @returns {Pomise} Promise JSON object
    */
-
   async fetch(url) {
     return await formatGIS({ link: url, pubDate: null })();
   }

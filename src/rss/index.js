@@ -16,7 +16,7 @@ export default async function(basin, example) {
   // Throws when the feed only has one result (no GIS products)
   // Usually, this is for off-season or when there are no active storms
   if (!items.length) {
-    console.log(`Only one item found in feed: "${items.title}"`)
+    console.log(`Only one item found in feed: "${items.title}"`);
     throw new Error('No active storms found');
   }
 
