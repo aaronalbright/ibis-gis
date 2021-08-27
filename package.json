@@ -29,7 +29,7 @@
     "fast-xml-parser": "^3.19.0",
     "lodash": "^4.17.21",
     "node-fetch": "^2.6.1",
-    "shpjs": "^3.6.3"
+    "shpjs": "^4.0.2"
   },
   "scripts": {
     "clean": "rm -rf dist",
