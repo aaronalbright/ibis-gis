@@ -1,14 +1,6 @@
 import formatGIS from './_formatGIS';
 
-const fileRef = {
-  forecast: 'Forecast',
-  windSpeed: 'Wind Speed Probabilities',
-  bestTrack: 'Preliminary Best Track',
-  windField: 'Wind Field',
-  stormSurge: 'Probabilistic Storm Surge 5ft'
-}
-
-export default function(shps, filterVal, name) {
+function fetchData(shps, filterVal, name) {
   let gis;
 
   if (name && filterVal !== 'Wind Speed Probabilities') {
@@ -18,16 +10,15 @@ export default function(shps, filterVal, name) {
   }
   
   if (gis.length < 1) {
+    // Returns summary data if no shapefiles are found
     if (filterVal == 'Forecast') {
       let arr = shps.filter(d => d.title.includes('Summary'));
-      console.log(arr);
       gis = [
         {
           name: name,
           date: arr[0].pubDate
         }
       ]
-      console.log(gis);
     }
     throw new Error(
       `Shapefile: "${filterVal}" not found for storm "${name}". It may not exist yet. Check https://www.nhc.noaa.gov/gis/ to ensure that it does.`
@@ -45,11 +36,6 @@ export default function(shps, filterVal, name) {
       stormName = ['Wind Speed Probabilities'];
     }
 
-    // Always fetches latest Wind Field
-    if (filterVal == 'Wind Field') {
-      d.link = d.link.replace(/(\d+).zip/, 'latest.zip')
-    } 
-
       return {
         name: stormName[0],
         date: d.pubDate,
@@ -58,3 +44,5 @@ export default function(shps, filterVal, name) {
       };
   });
 }
+
+export default fetchData
