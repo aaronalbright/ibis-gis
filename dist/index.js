@@ -93,7 +93,7 @@ function parseRSS (_x, _x2) {
 
 function _ref() {
   _ref = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime__default['default'].mark(function _callee(basin, example) {
-    var feed, res, xmlData, _parser$parse, rss, items, shps;
+    var feed, res, xmlData, _parser$parse, rss, items, shps, summaryData;
 
     return _regeneratorRuntime__default['default'].wrap(function _callee$(_context) {
       while (1) {
@@ -124,11 +124,19 @@ function _ref() {
 
           case 12:
             shps = items.filter(function (d) {
-              return d.title.includes('[shp]') || d.title.includes('Summary');
+              return d.title.includes('[shp]');
             });
-            return _context.abrupt("return", shps);
+            summaryData = items.filter(function (d) {
+              return d.title.includes('Summary');
+            }).map(function (d) {
+              return d['nhc:Cyclone'];
+            });
+            return _context.abrupt("return", {
+              shps: shps,
+              summaryData: summaryData
+            });
 
-          case 14:
+          case 15:
           case "end":
             return _context.stop();
         }
@@ -155,19 +163,28 @@ function formatGIS (_ref) {
 
           case 2:
             res = _context.sent;
-            _context.next = 5;
-            return res.buffer();
+
+            if (!(res.status !== 200)) {
+              _context.next = 5;
+              break;
+            }
+
+            throw new Error("Server responded with code ".concat(res.status, ": ").concat(res.statusText));
 
           case 5:
+            _context.next = 7;
+            return res.buffer();
+
+          case 7:
             buffer = _context.sent;
-            _context.next = 8;
+            _context.next = 10;
             return shp__default['default'](buffer);
 
-          case 8:
+          case 10:
             json = _context.sent;
 
             if (!json.length) {
-              _context.next = 13;
+              _context.next = 15;
               break;
             }
 
@@ -177,11 +194,11 @@ function formatGIS (_ref) {
               });
             }));
 
-          case 13:
+          case 15:
             json.pubDate = pubDate;
             return _context.abrupt("return", json);
 
-          case 15:
+          case 17:
           case "end":
             return _context.stop();
         }
@@ -190,7 +207,7 @@ function formatGIS (_ref) {
   }));
 }
 
-function fetchData (shps, filterVal, name) {
+function fetchData(shps, filterVal, name) {
   var gis;
 
   if (name && filterVal !== 'Wind Speed Probabilities') {
@@ -204,16 +221,15 @@ function fetchData (shps, filterVal, name) {
   }
 
   if (gis.length < 1) {
+    // Returns summary data if no shapefiles are found
     if (filterVal == 'Forecast') {
       var arr = shps.filter(function (d) {
         return d.title.includes('Summary');
       });
-      console.log(arr);
       gis = [{
         name: name,
         date: arr[0].pubDate
       }];
-      console.log(gis);
     }
 
     throw new Error("Shapefile: \"".concat(filterVal, "\" not found for storm \"").concat(name, "\". It may not exist yet. Check https://www.nhc.noaa.gov/gis/ to ensure that it does."));
@@ -227,11 +243,6 @@ function fetchData (shps, filterVal, name) {
     if (filterVal == 'Wind Speed Probabilities') {
       d.link = d.link.replace('halfDeg', '5km');
       stormName = ['Wind Speed Probabilities'];
-    } // Always fetches latest Wind Field
-
-
-    if (filterVal == 'Wind Field') {
-      d.link = d.link.replace(/(\d+).zip/, 'latest.zip');
     }
 
     return {
@@ -273,7 +284,8 @@ var Ibis = /*#__PURE__*/function () {
 
     _defineProperty(this, "init", function (filterVal, all) {
       return /*#__PURE__*/_asyncToGenerator( /*#__PURE__*/_regeneratorRuntime__default['default'].mark(function _callee() {
-        var shps, name, data;
+        var _yield$parseRSS, shps, summaryData, name, data;
+
         return _regeneratorRuntime__default['default'].wrap(function _callee$(_context) {
           while (1) {
             switch (_context.prev = _context.next) {
@@ -282,12 +294,15 @@ var Ibis = /*#__PURE__*/function () {
                 return parseRSS(_this.basin, _this.example);
 
               case 2:
-                shps = _context.sent;
+                _yield$parseRSS = _context.sent;
+                shps = _yield$parseRSS.shps;
+                summaryData = _yield$parseRSS.summaryData;
                 name = _this.name ? _this.name.toLowerCase() : undefined;
                 data = fetchData(shps, filterVal, name);
+                data.metaData = summaryData;
                 return _context.abrupt("return", all ? data : data[0]);
 
-              case 6:
+              case 9:
               case "end":
                 return _context.stop();
             }
