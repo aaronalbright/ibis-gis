@@ -36,10 +36,12 @@ class Ibis {
    */
   init = (filterVal, all) => {
     return async () => {
-      let shps = await parseRSS(this.basin, this.example);
+      let {shps, summaryData} = await parseRSS(this.basin, this.example);
       let name = this.name ? this.name.toLowerCase() : undefined;
 
       let data = fetchData(shps, filterVal, name);
+
+      data.metaData = summaryData;
 
       return all ? data : data[0];
     };

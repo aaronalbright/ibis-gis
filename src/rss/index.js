@@ -20,8 +20,9 @@ export default async function(basin, example) {
     throw new Error('No active storms found');
   }
 
-  let shps = items.filter(d => d.title.includes('[shp]') || d.title.includes('Summary'));
+  let shps = items.filter(d => d.title.includes('[shp]'));
+  let summaryData = items.filter(d => d.title.includes('Summary')).map(d => d['nhc:Cyclone']);
   
-  return shps
+  return {shps, summaryData}
 }
 
