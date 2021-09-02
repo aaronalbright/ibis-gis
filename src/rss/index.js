@@ -22,6 +22,8 @@ export default async function(basin, example) {
 
   let shps = items.filter(d => d.title.includes('[shp]'));
   let summaryData = items.filter(d => d.title.includes('Summary')).map(d => d['nhc:Cyclone']);
+
+  console.log(items.filter(d => d.title.includes('Summary')));
   
   return {shps, summaryData}
 }

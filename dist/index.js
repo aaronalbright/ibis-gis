@@ -131,12 +131,15 @@ function _ref() {
             }).map(function (d) {
               return d['nhc:Cyclone'];
             });
+            console.log(items.filter(function (d) {
+              return d.title.includes('Summary');
+            }));
             return _context.abrupt("return", {
               shps: shps,
               summaryData: summaryData
             });
 
-          case 15:
+          case 16:
           case "end":
             return _context.stop();
         }
@@ -299,7 +302,11 @@ var Ibis = /*#__PURE__*/function () {
                 summaryData = _yield$parseRSS.summaryData;
                 name = _this.name ? _this.name.toLowerCase() : undefined;
                 data = fetchData(shps, filterVal, name);
-                data.metaData = summaryData;
+
+                if (all) {
+                  data.metaData = summaryData;
+                }
+
                 return _context.abrupt("return", all ? data : data[0]);
 
               case 9:

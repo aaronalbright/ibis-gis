@@ -37,11 +37,13 @@ class Ibis {
   init = (filterVal, all) => {
     return async () => {
       let {shps, summaryData} = await parseRSS(this.basin, this.example);
-      let name = this.name ? this.name.toLowerCase() : undefined;
+      
+      const name = this.name ? this.name.toLowerCase() : undefined;
+      const data = fetchData(shps, filterVal, name);
 
-      let data = fetchData(shps, filterVal, name);
-
-      data.metaData = summaryData;
+      if (all) {
+        data.metaData = summaryData;
+      }
 
       return all ? data : data[0];
     };

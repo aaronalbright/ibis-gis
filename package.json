@@ -1,6 +1,6 @@
 {
   "name": "ibis-gis",
-  "version": "1.0.12",
+  "version": "1.0.13",
   "description": "Node hurricane GIS shapefile converter",
   "engines": {
     "node": ">=14"
