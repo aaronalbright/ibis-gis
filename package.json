@@ -28,7 +28,7 @@
     "@babel/runtime": "^7.14.0",
     "fast-xml-parser": "^3.19.0",
     "lodash": "^4.17.21",
-    "node-fetch": "^2.6.1",
+    "node-fetch": "^3.1.1",
     "shpjs": "^4.0.2"
   },
   "scripts": {
